@@ -5,6 +5,7 @@ import android.app.Activity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -23,7 +24,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.sigeve_android.Global;
+import com.example.sigeve_android.PrincipalAdminActivity;
+import com.example.sigeve_android.PrincipalConductorActivity;
+import com.example.sigeve_android.PrincipalUsuarioActivity;
 import com.example.sigeve_android.R;
+import com.example.sigeve_android.data.model.LoggedInUser;
 import com.example.sigeve_android.ui.login.LoginViewModel;
 import com.example.sigeve_android.ui.login.LoginViewModelFactory;
 
@@ -72,8 +77,27 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 if (loginResult.getSuccess() != null) {
                     updateUiWithUser(loginResult.getSuccess());
+                    setResult(Activity.RESULT_OK);
+
+                    LoggedInUserView model = loginResult.getSuccess();
+
+                    //decision
+                    Intent in;
+                    switch (model.getRole()) {
+                        case 1://Administrador
+                            in = new Intent(LoginActivity.this, PrincipalAdminActivity.class);
+                            break;
+                        case 2://Conductor
+                            in = new Intent(LoginActivity.this, PrincipalConductorActivity.class);
+                            break;
+                        case 3://Autoridad
+                            in = new Intent(LoginActivity.this, PrincipalUsuarioActivity.class);
+                            break;
+                        default:
+                            throw new IllegalStateException("Error de Roles: " + model.getRole());
+                    }
+                    startActivity(in);
                 }
-                setResult(Activity.RESULT_OK);
 
                 //Complete and destroy login activity once successful
 //                finish();

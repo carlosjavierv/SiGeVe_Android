@@ -1,12 +1,14 @@
-package com.example.sigeve_android.data;
+package com.example.sigeve_android;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.StrictMode;
-
-import com.example.sigeve_android.Global;
-import com.example.sigeve_android.data.model.LoggedInUser;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,26 +23,30 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-/**
- * Class that handles authentication w/ login credentials and retrieves user information.
- */
-public class LoginDataSource {
-
+public class AddUnidadActivity extends AppCompatActivity {
+    EditText txtNombre;
     Global global = new Global();
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_add_unidad);
+        txtNombre = findViewById(R.id.txtNombre);
+    }
 
-    public Result<LoggedInUser> login(String username, String password) {
+    public void Guardar(View v) {
         String host = global.getHost();
 
-        String ws = host.concat("/login");
+        //UIL Del web service
+        String ws = host.concat("/unidad");
 
+        //Permisos de la aplicacion
         StrictMode.ThreadPolicy politica = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(politica);
 
         URL url = null;
         HttpURLConnection conn;
-
+        //Capturar excepciones
         try {
-
             url = new URL(ws);
             conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(10000);
@@ -50,8 +56,7 @@ public class LoginDataSource {
             conn.setDoOutput(true);
 
             Uri.Builder builder = new Uri.Builder()
-                    .appendQueryParameter("email", username)
-                    .appendQueryParameter("password", password);
+                    .appendQueryParameter("nombre", txtNombre.getText().toString());
 
             String query = builder.build().getEncodedQuery();
             OutputStream os = conn.getOutputStream();
@@ -75,28 +80,25 @@ public class LoginDataSource {
             }
             json = response.toString();
 
-            JSONObject jsnobject = new JSONObject(json);
+            JSONObject jsonObject = new JSONObject(json);
+            JSONObject jsonResult = (JSONObject) jsonObject.get("result");
 
-            String error = jsnobject.getString("error");
+            Toast.makeText(getApplicationContext(),jsonResult.getString("message") , Toast.LENGTH_LONG).show();
 
-            if(!error.isEmpty()){
-                return new Result.Error(new Exception(error,new Throwable()));
-            }
-            String idUsuario = jsnobject.getString("idUsuario");
-            String displayName = jsnobject.getString("displayName");
-            String role = jsnobject.getString("role");
+            Intent ide = new Intent(AddUnidadActivity.this, PrincipalAdminActivity.class);
+            startActivity(ide);
 
-            return new Result.Success<>(new LoggedInUser(idUsuario, displayName,Integer.parseInt(role)));
         } catch (MalformedURLException e) {
-            return new Result.Error(new IOException(e.getMessage(), e));
-        }catch (IOException e){
-            return new Result.Error(new IOException(e.getMessage(), e));
-        }catch(JSONException e){
-            return new Result.Error(new IOException(e.getMessage(), e));
+            Toast.makeText(getApplicationContext(), "ERROR " + e.getMessage(), Toast.LENGTH_LONG).show();
+        } catch (IOException e) {
+            Toast.makeText(getApplicationContext(), "ERROR " + e.getMessage(), Toast.LENGTH_LONG).show();
+        } catch (JSONException e) {
+            Toast.makeText(getApplicationContext(), "ERROR " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
-    public void logout() {
-        // TODO: revoke authentication
+    public void Cancelar(View v){
+        finish();
     }
+
 }

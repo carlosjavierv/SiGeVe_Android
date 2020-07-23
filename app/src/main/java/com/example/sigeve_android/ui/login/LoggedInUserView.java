@@ -5,13 +5,18 @@ package com.example.sigeve_android.ui.login;
  */
 class LoggedInUserView {
     private String displayName;
-    //... other data fields that may be accessible to the UI
+    private int role;
 
-    LoggedInUserView(String displayName) {
+    LoggedInUserView(String displayName,int role) {
         this.displayName = displayName;
+        this.role = role;
     }
 
     String getDisplayName() {
         return displayName;
+    }
+
+    int getRole() {
+        return role;
     }
 }
