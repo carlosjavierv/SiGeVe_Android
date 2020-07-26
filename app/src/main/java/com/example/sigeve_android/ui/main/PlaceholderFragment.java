@@ -1,11 +1,13 @@
 package com.example.sigeve_android.ui.main;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -18,6 +20,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.example.sigeve_android.EditUnidadActivity;
 import com.example.sigeve_android.Global;
 import com.example.sigeve_android.PrincipalAdminActivity;
 import com.example.sigeve_android.R;
@@ -37,7 +40,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Objects;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -98,6 +100,19 @@ public class PlaceholderFragment extends Fragment {
                         arrayAdapter = new ArrayAdapter(root.getContext(), android.R.layout.simple_list_item_1, unidades);
                         list = root.findViewById(R.id.list);
                         list.setAdapter(arrayAdapter);
+
+                        list.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                Unidad unidad = (Unidad)parent.getItemAtPosition(position);
+
+                                Intent intent = new Intent(root.getContext(), EditUnidadActivity.class);
+                                intent.putExtra("id",String.valueOf(unidad.getId()));
+
+                                startActivity(intent);
+                            }
+                        });
 
                         if (unidades.size() == 0) {
                             getListaUnidad();
@@ -223,14 +238,20 @@ public class PlaceholderFragment extends Fragment {
             }
             json = response.toString();
 
-            JSONArray jsonArr = null;
-
-            jsonArr = new JSONArray(json);
+            JSONArray jsonArr = new JSONArray(json);
 
             for (int i = 0; i < jsonArr.length(); i++) {
                 JSONObject objeto = jsonArr.getJSONObject(i);
 
-                Vehiculo vehiculo = new Vehiculo(Integer.parseInt(objeto.optString("id")), objeto.optString("marca"),objeto.optString("placa"));
+                Vehiculo vehiculo = new Vehiculo(
+                        Integer.parseInt(objeto.optString("id")),
+                        Integer.parseInt(objeto.optString("unidad_id")),
+                        Integer.parseInt(objeto.optString("usuario_id")),
+                        objeto.optString("marca"),
+                        objeto.optString("modelo"),
+                        objeto.optString("anio"),
+                        objeto.optString("placa")
+                );
                 vehiculos.add(vehiculo);
             }
             arrayAdapter.notifyDataSetChanged();

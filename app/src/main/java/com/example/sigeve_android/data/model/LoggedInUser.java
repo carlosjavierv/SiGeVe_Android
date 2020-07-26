@@ -7,12 +7,12 @@ public class LoggedInUser {
 
     private String userId;
     private String displayName;
-    private int role;
+    private int rol;
 
-    public LoggedInUser(String userId, String displayName,int role) {
+    public LoggedInUser(String userId, String displayName,int rol) {
         this.userId = userId;
         this.displayName = displayName;
-        this.role = role;
+        this.rol = rol;
     }
 
     public String getUserId() {
@@ -23,7 +23,7 @@ public class LoggedInUser {
         return displayName;
     }
 
-    public int getRole() {
-        return role;
+    public int getRol() {
+        return rol;
     }
 }

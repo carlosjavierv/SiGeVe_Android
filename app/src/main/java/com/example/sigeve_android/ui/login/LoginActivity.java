@@ -83,7 +83,7 @@ public class LoginActivity extends AppCompatActivity {
 
                     //decision
                     Intent in;
-                    switch (model.getRole()) {
+                    switch (model.getRol()) {
                         case 1://Administrador
                             in = new Intent(LoginActivity.this, PrincipalAdminActivity.class);
                             break;
@@ -94,7 +94,7 @@ public class LoginActivity extends AppCompatActivity {
                             in = new Intent(LoginActivity.this, PrincipalUsuarioActivity.class);
                             break;
                         default:
-                            throw new IllegalStateException("Error de Roles: " + model.getRole());
+                            throw new IllegalStateException("Error de Roles: " + model.getRol());
                     }
                     startActivity(in);
                 }

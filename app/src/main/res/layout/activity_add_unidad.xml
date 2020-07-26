@@ -7,7 +7,7 @@
     tools:context=".AddUnidadActivity">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/lblTitulo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="33dp"
@@ -59,7 +59,7 @@
         app:layout_constraintBottom_toTopOf="@+id/btnGuardar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/lblNombre"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toBottomOf="@+id/lblTitulo" />
 
     <TextView
         android:id="@+id/lblNombre"

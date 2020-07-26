@@ -5,18 +5,18 @@ package com.example.sigeve_android.ui.login;
  */
 class LoggedInUserView {
     private String displayName;
-    private int role;
+    private int rol;
 
-    LoggedInUserView(String displayName,int role) {
+    LoggedInUserView(String displayName,int rol) {
         this.displayName = displayName;
-        this.role = role;
+        this.rol = rol;
     }
 
     String getDisplayName() {
         return displayName;
     }
 
-    int getRole() {
-        return role;
+    int getRol() {
+        return rol;
     }
 }

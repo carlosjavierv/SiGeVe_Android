@@ -84,9 +84,14 @@ public class LoginDataSource {
             }
             String idUsuario = jsnobject.getString("idUsuario");
             String displayName = jsnobject.getString("displayName");
-            String role = jsnobject.getString("role");
+            String rol = jsnobject.getString("rol");
 
-            return new Result.Success<>(new LoggedInUser(idUsuario, displayName,Integer.parseInt(role)));
+            System.out.println("///////////////////////////////");
+            System.out.println(idUsuario);
+            System.out.println(displayName);
+            System.out.println(rol);
+
+            return new Result.Success<>(new LoggedInUser(idUsuario, displayName,Integer.parseInt(rol)));
         } catch (MalformedURLException e) {
             return new Result.Error(new IOException(e.getMessage(), e));
         }catch (IOException e){

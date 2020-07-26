@@ -23,15 +23,73 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class AddUnidadActivity extends AppCompatActivity {
-    EditText txtNombre;
+public class EditUnidadActivity extends AppCompatActivity {
+
+    Bundle dato;
     Global global = new Global();
+    String id;
+    EditText txtNombre;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_unidad);
+        setContentView(R.layout.activity_edit_unidad);
+
+        dato = getIntent().getExtras();
+        id = dato.getString("id");
+        System.out.println("************************");
+        System.out.println(id);
         txtNombre = findViewById(R.id.txtNombre);
+
+        getData();
+    }
+
+    public void getData() {
+
+        String host = global.getHost();
+
+        String ws = host.concat("/unidad/");
+        ws = ws.concat(id);
+
+        //Permisos de la aplicacion
+        StrictMode.ThreadPolicy politica = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(politica);
+
+        URL url = null;
+        HttpURLConnection conn;
+        //Capturar excepciones
+        try {
+            url = new URL(ws);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setReadTimeout(10000);
+            conn.setConnectTimeout(15000);
+            conn.setRequestMethod("GET");
+            conn.connect();
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+            String inputLine;
+            StringBuffer response = new StringBuffer();
+            String json;
+
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            json = response.toString();
+
+            JSONObject jsnobject = new JSONObject(json);
+
+            String nom = jsnobject.getString("nombre");
+
+            txtNombre.setText(nom);
+
+        } catch (MalformedURLException e) {
+            Toast.makeText(getApplicationContext(), "ERROR " + e.getMessage(), Toast.LENGTH_LONG).show();
+        } catch (IOException e) {
+            Toast.makeText(getApplicationContext(), "ERROR " + e.getMessage(), Toast.LENGTH_LONG).show();
+        } catch (JSONException e) {
+            Toast.makeText(getApplicationContext(), "ERROR " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
     }
 
     public void Guardar(View v) {
@@ -42,7 +100,7 @@ public class AddUnidadActivity extends AppCompatActivity {
             String host = global.getHost();
 
             //UIL Del web service
-            String ws = host.concat("/unidad");
+            String ws = host.concat("/unidad/"+id);
 
             //Permisos de la aplicacion
             StrictMode.ThreadPolicy politica = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -56,7 +114,7 @@ public class AddUnidadActivity extends AppCompatActivity {
                 conn = (HttpURLConnection) url.openConnection();
                 conn.setReadTimeout(10000);
                 conn.setConnectTimeout(15000);
-                conn.setRequestMethod("POST");
+                conn.setRequestMethod("PUT");
                 conn.setDoInput(true);
                 conn.setDoOutput(true);
 
@@ -90,7 +148,7 @@ public class AddUnidadActivity extends AppCompatActivity {
 
                 Toast.makeText(getApplicationContext(), jsonResult.getString("message"), Toast.LENGTH_LONG).show();
 
-                Intent ide = new Intent(AddUnidadActivity.this, PrincipalAdminActivity.class);
+                Intent ide = new Intent(EditUnidadActivity.this, PrincipalAdminActivity.class);
                 startActivity(ide);
 
             } catch (MalformedURLException e) {
@@ -108,5 +166,4 @@ public class AddUnidadActivity extends AppCompatActivity {
     public void Cancelar(View v) {
         finish();
     }
-
 }
