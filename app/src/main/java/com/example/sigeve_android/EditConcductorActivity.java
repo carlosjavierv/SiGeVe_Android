@@ -23,32 +23,31 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class EditUnidadActivity extends AppCompatActivity {
-
-    Bundle dato;
-    Global global = new Global();
+public class EditConcductorActivity extends AppCompatActivity {
+    String host;
+    EditText txtNombre,txtEmail,txtContrasenia;
     String id;
-    EditText txtNombre;
+    Bundle dato;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_unidad);
+        setContentView(R.layout.activity_edit_concductor);
+
+        host = ((Global) this.getApplication()).getHost();
+        txtNombre = findViewById(R.id.txtNombre);
+        txtEmail = findViewById(R.id.txtEmail);
+        txtContrasenia = findViewById(R.id.txtContrasenia);
 
         dato = getIntent().getExtras();
         id = dato.getString("id");
-        System.out.println("************************");
-        System.out.println(id);
-        txtNombre = findViewById(R.id.txtNombre);
-
         getData();
+
     }
 
     public void getData() {
 
-        String host = global.getHost();
-
-        String ws = host.concat("/unidad/");
+        String ws = host.concat("/conductor/");
         ws = ws.concat(id);
 
         //Permisos de la aplicacion
@@ -80,8 +79,10 @@ public class EditUnidadActivity extends AppCompatActivity {
             JSONObject jsnobject = new JSONObject(json);
 
             String nom = jsnobject.getString("nombre");
+            String email = jsnobject.getString("email");
 
             txtNombre.setText(nom);
+            txtEmail.setText(email);
 
         } catch (MalformedURLException e) {
             Toast.makeText(getApplicationContext(), "ERROR " + e.getMessage(), Toast.LENGTH_LONG).show();
@@ -95,12 +96,13 @@ public class EditUnidadActivity extends AppCompatActivity {
     public void Guardar(View v) {
 
         String nombre = txtNombre.getText().toString();
+        String email = txtEmail.getText().toString();
+        String contrasenia = txtContrasenia.getText().toString();
 
-        if (!nombre.isEmpty()) {
-            String host = global.getHost();
+        if (!nombre.isEmpty() && !email.isEmpty() && !contrasenia.isEmpty()) {
 
             //UIL Del web service
-            String ws = host.concat("/unidad/"+id);
+            String ws = host.concat("/conductor/"+id);
 
             //Permisos de la aplicacion
             StrictMode.ThreadPolicy politica = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -119,7 +121,9 @@ public class EditUnidadActivity extends AppCompatActivity {
                 conn.setDoOutput(true);
 
                 Uri.Builder builder = new Uri.Builder()
-                        .appendQueryParameter("nombre", nombre);
+                        .appendQueryParameter("nombre", nombre)
+                        .appendQueryParameter("email", email)
+                        .appendQueryParameter("password", contrasenia);
 
                 String query = builder.build().getEncodedQuery();
                 OutputStream os = conn.getOutputStream();
@@ -148,7 +152,7 @@ public class EditUnidadActivity extends AppCompatActivity {
 
                 Toast.makeText(getApplicationContext(), jsonResult.getString("message"), Toast.LENGTH_LONG).show();
 
-                Intent ide = new Intent(EditUnidadActivity.this, PrincipalAdminActivity.class);
+                Intent ide = new Intent(EditConcductorActivity.this, PrincipalAdminActivity.class);
                 startActivity(ide);
 
             } catch (MalformedURLException e) {
@@ -159,7 +163,7 @@ public class EditUnidadActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "ERROR " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
         } else {
-            Toast.makeText(getApplicationContext(), "Ingrese un nombre para la Unidad", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Datos requeridos: nombre, email, contraseña", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -168,67 +172,60 @@ public class EditUnidadActivity extends AppCompatActivity {
     }
 
     public void Eliminar(View v){
-        String nombre = txtNombre.getText().toString();
 
-        if (!nombre.isEmpty()) {
-            String host = global.getHost();
+        //UIL Del web service
+        String ws = host.concat("/conductor/"+id);
 
-            //UIL Del web service
-            String ws = host.concat("/unidad/"+id);
+        //Permisos de la aplicacion
+        StrictMode.ThreadPolicy politica = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(politica);
 
-            //Permisos de la aplicacion
-            StrictMode.ThreadPolicy politica = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-            StrictMode.setThreadPolicy(politica);
+        URL url = null;
+        HttpURLConnection conn;
+        //Capturar excepciones
+        try {
+            url = new URL(ws);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setReadTimeout(10000);
+            conn.setConnectTimeout(15000);
+            conn.setRequestMethod("DELETE");
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
 
-            URL url = null;
-            HttpURLConnection conn;
-            //Capturar excepciones
-            try {
-                url = new URL(ws);
-                conn = (HttpURLConnection) url.openConnection();
-                conn.setReadTimeout(10000);
-                conn.setConnectTimeout(15000);
-                conn.setRequestMethod("DELETE");
-                conn.setDoInput(true);
-                conn.setDoOutput(true);
+            OutputStream os = conn.getOutputStream();
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
 
-                OutputStream os = conn.getOutputStream();
-                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+            writer.flush();
+            writer.close();
+            os.close();
 
-                writer.flush();
-                writer.close();
-                os.close();
+            conn.connect();
 
-                conn.connect();
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 
-                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            String inputLine;
+            StringBuffer response = new StringBuffer();
+            String json;
 
-                String inputLine;
-                StringBuffer response = new StringBuffer();
-                String json;
-
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-                json = response.toString();
-
-                JSONObject jsonObject = new JSONObject(json);
-                JSONObject jsonResult = (JSONObject) jsonObject.get("result");
-
-                Toast.makeText(getApplicationContext(), jsonResult.getString("message"), Toast.LENGTH_LONG).show();
-
-                Intent ide = new Intent(EditUnidadActivity.this, PrincipalAdminActivity.class);
-                startActivity(ide);
-
-            } catch (MalformedURLException e) {
-                Toast.makeText(getApplicationContext(), "ERROR " + e.getMessage(), Toast.LENGTH_LONG).show();
-            } catch (IOException e) {
-                Toast.makeText(getApplicationContext(), "ERROR " + e.getMessage(), Toast.LENGTH_LONG).show();
-            } catch (JSONException e) {
-                Toast.makeText(getApplicationContext(), "ERROR " + e.getMessage(), Toast.LENGTH_LONG).show();
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
             }
-        } else {
-            Toast.makeText(getApplicationContext(), "Ingrese un nombre para la Unidad", Toast.LENGTH_LONG).show();
+            json = response.toString();
+
+            JSONObject jsonObject = new JSONObject(json);
+            JSONObject jsonResult = (JSONObject) jsonObject.get("result");
+
+            Toast.makeText(getApplicationContext(), jsonResult.getString("message"), Toast.LENGTH_LONG).show();
+
+            Intent ide = new Intent(EditConcductorActivity.this, PrincipalAdminActivity.class);
+            startActivity(ide);
+
+        } catch (MalformedURLException e) {
+            Toast.makeText(getApplicationContext(), "ERROR " + e.getMessage(), Toast.LENGTH_LONG).show();
+        } catch (IOException e) {
+            Toast.makeText(getApplicationContext(), "ERROR " + e.getMessage(), Toast.LENGTH_LONG).show();
+        } catch (JSONException e) {
+            Toast.makeText(getApplicationContext(), "ERROR " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 }

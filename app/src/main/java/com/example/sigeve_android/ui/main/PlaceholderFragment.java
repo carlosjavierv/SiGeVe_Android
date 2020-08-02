@@ -20,7 +20,10 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.example.sigeve_android.EditConcductorActivity;
 import com.example.sigeve_android.EditUnidadActivity;
+import com.example.sigeve_android.EditUsuarioActivity;
+import com.example.sigeve_android.EditVehiculoActivity;
 import com.example.sigeve_android.Global;
 import com.example.sigeve_android.PrincipalAdminActivity;
 import com.example.sigeve_android.R;
@@ -123,6 +126,20 @@ public class PlaceholderFragment extends Fragment {
                         list = root.findViewById(R.id.list);
                         list.setAdapter(arrayAdapter);
 
+                        list.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                Conductor conductor = (Conductor)parent.getItemAtPosition(position);
+
+                                Intent intent = new Intent(root.getContext(), EditConcductorActivity.class);
+                                intent.putExtra("id",String.valueOf(conductor.getId()));
+
+                                startActivity(intent);
+                            }
+                        });
+
+
                         if (conductores.size() == 0) {
                             getListaConductor();
                         }
@@ -132,6 +149,18 @@ public class PlaceholderFragment extends Fragment {
                         list = root.findViewById(R.id.list);
                         list.setAdapter(arrayAdapter);
 
+                        list.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                Vehiculo vehiculo = (Vehiculo)parent.getItemAtPosition(position);
+
+                                Intent intent = new Intent(root.getContext(), EditVehiculoActivity.class);
+                                intent.putExtra("id",String.valueOf(vehiculo.getId()));
+
+                                startActivity(intent);
+                            }
+                        });
                         if (vehiculos.size() == 0) {
                             getListaVehiculo();
                         }
@@ -140,6 +169,19 @@ public class PlaceholderFragment extends Fragment {
                         arrayAdapter = new ArrayAdapter(root.getContext(), android.R.layout.simple_list_item_1, usuarios);
                         list = root.findViewById(R.id.list);
                         list.setAdapter(arrayAdapter);
+
+                        list.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                Usuario usuario = (Usuario)parent.getItemAtPosition(position);
+
+                                Intent intent = new Intent(root.getContext(), EditUsuarioActivity.class);
+                                intent.putExtra("id",String.valueOf(usuario.getId()));
+
+                                startActivity(intent);
+                            }
+                        });
 
                         if (usuarios.size() == 0) {
                             getListaUsuario();
