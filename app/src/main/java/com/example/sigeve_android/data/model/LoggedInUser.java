@@ -5,17 +5,17 @@ package com.example.sigeve_android.data.model;
  */
 public class LoggedInUser {
 
-    private String userId;
+    private int userId;
     private String displayName;
     private int rol;
 
-    public LoggedInUser(String userId, String displayName,int rol) {
+    public LoggedInUser(int userId, String displayName,int rol) {
         this.userId = userId;
         this.displayName = displayName;
         this.rol = rol;
     }
 
-    public String getUserId() {
+    public int getUserId() {
         return userId;
     }
 

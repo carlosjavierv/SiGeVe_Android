@@ -91,7 +91,7 @@ public class LoginDataSource {
             System.out.println(displayName);
             System.out.println(rol);
 
-            return new Result.Success<>(new LoggedInUser(idUsuario, displayName,Integer.parseInt(rol)));
+            return new Result.Success<>(new LoggedInUser(Integer.parseInt(idUsuario), displayName,Integer.parseInt(rol)));
         } catch (MalformedURLException e) {
             return new Result.Error(new IOException(e.getMessage(), e));
         }catch (IOException e){

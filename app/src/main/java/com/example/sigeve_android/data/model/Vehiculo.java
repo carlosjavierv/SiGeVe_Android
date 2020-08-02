@@ -78,6 +78,6 @@ public class Vehiculo {
 
     @Override
     public String toString() {
-        return marca + ' '+placa;
+        return marca + " - "+placa;
     }
 }

@@ -34,6 +34,9 @@ import java.util.ArrayList;
 public class AddUsuarioActivity extends AppCompatActivity {
     Global global = new Global();
     EditText txtNombre,txtEmail,txtContrasenia;
+    Spinner spUnidad;
+    ArrayList<Unidad> unidades = new ArrayList<>();
+
 //    ArrayList<Rol> roles = new ArrayList<>();
 //    Spinner spRol;
 
@@ -45,6 +48,8 @@ public class AddUsuarioActivity extends AppCompatActivity {
         txtNombre = findViewById(R.id.txtNombre);
         txtEmail = findViewById(R.id.txtEmail);
         txtContrasenia = findViewById(R.id.txtContrasenia);
+        spUnidad = findViewById(R.id.spUnidad);
+        getListaUnidad();
 
 //        spRol = findViewById(R.id.spRol);
 //        getListaRol();
@@ -55,6 +60,8 @@ public class AddUsuarioActivity extends AppCompatActivity {
         String nombre = txtNombre.getText().toString();
         String email = txtEmail.getText().toString();
         String contrasenia = txtContrasenia.getText().toString();
+        Unidad unidad = (Unidad)spUnidad.getSelectedItem();
+
 //        Rol rol = (Rol)spRol.getSelectedItem();
 
         if (!nombre.isEmpty() && !email.isEmpty() && !contrasenia.isEmpty()) {
@@ -82,6 +89,7 @@ public class AddUsuarioActivity extends AppCompatActivity {
                 Uri.Builder builder = new Uri.Builder()
                         .appendQueryParameter("nombre", nombre)
                         .appendQueryParameter("email", email)
+                        .appendQueryParameter("unidad_id", String.valueOf(unidad.getId()))
                         .appendQueryParameter("password", contrasenia);
 //                        .appendQueryParameter("rol_id", String.valueOf(rol.getId()))
 
@@ -179,6 +187,61 @@ public class AddUsuarioActivity extends AppCompatActivity {
         } catch (JSONException e) {
             Toast.makeText(getApplicationContext(), "ERROR " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
+    }
+    public void getListaUnidad() {
+
+        //UIL Del web service
+        String host = global.getHost();
+        String ws = host.concat("/unidad");
+
+        //Permisos de la aplicacion
+        StrictMode.ThreadPolicy politica = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(politica);
+
+        URL url = null;
+        HttpURLConnection conn;
+
+        try {
+            url = new URL(ws);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setReadTimeout(10000);
+            conn.setConnectTimeout(15000);
+            conn.setRequestMethod("GET");
+            conn.connect();
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+            String inputLine;
+            StringBuffer response = new StringBuffer();
+            String json;
+
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            json = response.toString();
+
+            JSONArray jsonArr = null;
+
+            jsonArr = new JSONArray(json);
+
+            for (int i = 0; i < jsonArr.length(); i++) {
+                JSONObject objeto = jsonArr.getJSONObject(i);
+
+                Unidad unidad = new Unidad(Integer.parseInt(objeto.optString("id")), objeto.optString("nombre"));
+                unidades.add(unidad);
+            }
+            ArrayAdapter<Unidad> adapterUnidad = new ArrayAdapter<Unidad>(this, android.R.layout.simple_spinner_item, unidades);
+            spUnidad.setAdapter(adapterUnidad);
+
+        } catch (MalformedURLException e) {
+            Toast.makeText(getApplicationContext(), "ERROR " + e.getMessage(), Toast.LENGTH_LONG).show();
+        } catch (IOException e) {
+            Toast.makeText(getApplicationContext(), "ERROR " + e.getMessage(), Toast.LENGTH_LONG).show();
+        } catch (JSONException e) {
+            Toast.makeText(getApplicationContext(), "ERROR " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+
+
     }
 
     public void Cancelar(View v) {

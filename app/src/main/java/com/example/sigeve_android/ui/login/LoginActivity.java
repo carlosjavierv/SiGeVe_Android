@@ -5,6 +5,7 @@ import android.app.Activity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import android.app.Application;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -28,9 +29,6 @@ import com.example.sigeve_android.PrincipalAdminActivity;
 import com.example.sigeve_android.PrincipalConductorActivity;
 import com.example.sigeve_android.PrincipalUsuarioActivity;
 import com.example.sigeve_android.R;
-import com.example.sigeve_android.data.model.LoggedInUser;
-import com.example.sigeve_android.ui.login.LoginViewModel;
-import com.example.sigeve_android.ui.login.LoginViewModelFactory;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -80,6 +78,7 @@ public class LoginActivity extends AppCompatActivity {
                     setResult(Activity.RESULT_OK);
 
                     LoggedInUserView model = loginResult.getSuccess();
+                    ((Global) getApplication()).setIdUsuario(model.getId());
 
                     //decision
                     Intent in;
@@ -89,9 +88,11 @@ public class LoginActivity extends AppCompatActivity {
                             break;
                         case 2://Conductor
                             in = new Intent(LoginActivity.this, PrincipalConductorActivity.class);
+                            in.putExtra("idUsuario",model.getId());
                             break;
                         case 3://Autoridad
                             in = new Intent(LoginActivity.this, PrincipalUsuarioActivity.class);
+//                            in.putExtra("idUsuario",model.getId());
                             break;
                         default:
                             throw new IllegalStateException("Error de Roles: " + model.getRol());
